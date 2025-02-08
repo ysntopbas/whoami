@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:whoami/features/category/domain/models/category_model.dart';
 import 'package:whoami/features/category/presentation/providers/category_provider.dart';
+import 'package:whoami/features/game/presentation/pages/game_settings_page.dart';
 
 class NewGamePage extends ConsumerStatefulWidget {
   const NewGamePage({super.key});
@@ -167,7 +168,12 @@ class _NewGamePageState extends ConsumerState<NewGamePage> {
       elevation: 4,
       child: InkWell(
         onTap: () {
-          // TODO: Oyun başlatma sayfasına yönlendir
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => GameSettingsPage(category: category),
+            ),
+          );
         },
         child: Padding(
           padding: const EdgeInsets.all(12.0),

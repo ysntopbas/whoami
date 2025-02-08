@@ -49,5 +49,13 @@
   "no_shared_categories": "No shared categories yet",
   "no_custom_categories": "No custom categories yet",
   "all_categories": "All Categories",
-  "categories_load_error": "Error loading categories"
+  "categories_load_error": "Error loading categories",
+  "game_settings": "Game Settings",
+  "player_name": "Player Name",
+  "add_player": "Add Player",
+  "time_per_player": "Time Per Player",
+  "seconds": "seconds",
+  "start_game": "Start Game",
+  "min_players_warning": "Minimum 2 players required",
+  "selected_category": "Selected Category"
 } 

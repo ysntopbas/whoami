@@ -49,5 +49,13 @@
   "no_shared_categories": "Henüz paylaşılan kategori yok",
   "no_custom_categories": "Henüz özel kategoriniz yok",
   "all_categories": "Tüm Kategoriler",
-  "categories_load_error": "Kategoriler yüklenirken hata oluştu"
+  "categories_load_error": "Kategoriler yüklenirken hata oluştu",
+  "game_settings": "Oyun Ayarları",
+  "player_name": "Oyuncu Adı",
+  "add_player": "Oyuncu Ekle",
+  "time_per_player": "Oyuncu Başına Süre",
+  "seconds": "saniye",
+  "start_game": "Oyunu Başlat",
+  "min_players_warning": "En az 2 oyuncu gerekli",
+  "selected_category": "Seçilen Kategori"
 } 
