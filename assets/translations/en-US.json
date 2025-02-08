@@ -15,6 +15,9 @@
   "add_category": "Add Category",
   "category_name": "Category Name",
   "category_items": "Category Items",
+  "category_items_hint": "Enter one item per line",
+  "category_items_warning": "You must enter at least one item",
+  "items_empty_warning": "Please enter at least one item",
   "add_item": "Add Item",
   "delete_category": "Delete Category",
   "delete_item": "Delete Item",
@@ -37,5 +40,8 @@
   "error": "Error",
   "success": "Success",
   "ok": "OK",
-  "no_recents": "No recent emojis"
+  "no_recents": "No recent emojis",
+  "shared_categories_load_error": "Error loading shared categories",
+  "firebase_connection_error": "Could not connect to Firebase",
+  "category_not_custom": "You can only publish categories that you created"
 } 

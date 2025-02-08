@@ -40,6 +40,7 @@ dependencies:
   firebase_core: ^3.11.0
   shared_preferences: ^2.2.0  
   emoji_picker_flutter: ^1.6.3
+  cloud_firestore: ^5.6.3
 
 dev_dependencies:
   flutter_test:

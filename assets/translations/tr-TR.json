@@ -37,5 +37,11 @@
   "error": "Hata",
   "success": "Başarılı",
   "ok": "Tamam",
-  "no_recents": "Son kullanılan emoji yok"
+  "no_recents": "Son kullanılan emoji yok",
+  "category_items_hint": "Her satıra bir öğe gelecek şekilde yazın",
+  "category_items_warning": "En az bir öğe girmelisiniz",
+  "items_empty_warning": "Lütfen en az bir öğe girin",
+  "shared_categories_load_error": "Paylaşılan kategoriler yüklenirken hata oluştu",
+  "firebase_connection_error": "Firebase bağlantısı kurulamadı",
+  "category_not_custom": "Sadece kendi oluşturduğunuz kategorileri yayınlayabilirsiniz"
 } 

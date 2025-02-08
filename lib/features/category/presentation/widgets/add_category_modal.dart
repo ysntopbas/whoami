@@ -15,29 +15,14 @@ class AddCategoryModal extends ConsumerStatefulWidget {
 class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
   final _formKey = GlobalKey<FormState>();
   final _categoryNameController = TextEditingController();
-  final List<TextEditingController> _itemControllers = [TextEditingController()];
-  String _selectedEmoji = '📝'; // Varsayılan emoji
+  final _itemsController = TextEditingController();
+  String _selectedEmoji = '📝';
 
   @override
   void dispose() {
     _categoryNameController.dispose();
-    for (var controller in _itemControllers) {
-      controller.dispose();
-    }
+    _itemsController.dispose();
     super.dispose();
-  }
-
-  void _addNewItemField() {
-    setState(() {
-      _itemControllers.add(TextEditingController());
-    });
-  }
-
-  void _removeItemField(int index) {
-    setState(() {
-      _itemControllers[index].dispose();
-      _itemControllers.removeAt(index);
-    });
   }
 
   void _showEmojiPicker() {
@@ -53,30 +38,25 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
               });
               Navigator.pop(context);
             },
+            textEditingController: TextEditingController(),
             config: Config(
+              replaceEmojiOnLimitExceed: false,
               columns: 7,
-              emojiSizeMax: 32 * (foundation.defaultTargetPlatform == TargetPlatform.iOS ? 1.30 : 1.0),
+              emojiSizeMax: 32.0 * (foundation.defaultTargetPlatform == TargetPlatform.iOS ? 1.30 : 1.0),
               verticalSpacing: 0,
               horizontalSpacing: 0,
-              gridPadding: EdgeInsets.zero,
               initCategory: Category.SMILEYS,
               bgColor: Theme.of(context).scaffoldBackgroundColor,
               indicatorColor: Theme.of(context).colorScheme.primary,
               iconColor: Colors.grey,
               iconColorSelected: Theme.of(context).colorScheme.primary,
               backspaceColor: Theme.of(context).colorScheme.primary,
-              skinToneDialogBgColor: Colors.white,
-              skinToneIndicatorColor: Colors.grey,
-              enableSkinTones: true,
-              recentTabBehavior: RecentTabBehavior.RECENT,
               recentsLimit: 28,
               noRecents: Text(
                 'no_recents'.tr(),
                 style: const TextStyle(fontSize: 20, color: Colors.black26),
                 textAlign: TextAlign.center,
               ),
-              loadingIndicator: const SizedBox.shrink(),
-              tabIndicatorAnimDuration: kTabScrollDuration,
               categoryIcons: const CategoryIcons(),
               buttonMode: ButtonMode.MATERIAL,
             ),
@@ -88,16 +68,25 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
 
   void _saveCategory() {
     if (_formKey.currentState!.validate()) {
-      final items = _itemControllers
-          .map((controller) => controller.text.trim())
-          .where((text) => text.isNotEmpty)
+      // Her satırı ayrı bir öğe olarak al ve boş satırları filtrele
+      final items = _itemsController.text
+          .split('\n')
+          .map((item) => item.trim())
+          .where((item) => item.isNotEmpty)
           .toList();
+
+      if (items.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('items_empty_warning'.tr())),
+        );
+        return;
+      }
 
       ref.read(categoryProvider.notifier).addCategory(
             _categoryNameController.text.trim(),
             items,
             Localizations.localeOf(context).languageCode,
-            _selectedEmoji, // Seçilen emojiyi gönder
+            _selectedEmoji,
           );
 
       Navigator.pop(context);
@@ -118,7 +107,6 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Emoji seçici butonu
             InkWell(
               onTap: _showEmojiPicker,
               child: Container(
@@ -148,32 +136,21 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
               },
             ),
             const SizedBox(height: 16),
-            ...List.generate(_itemControllers.length, (index) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _itemControllers[index],
-                        decoration: InputDecoration(
-                          labelText: '${"name".tr()} ${index + 1}',
-                          border: const OutlineInputBorder(),
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.remove_circle_outline),
-                      onPressed: () => _removeItemField(index),
-                    ),
-                  ],
-                ),
-              );
-            }),
-            TextButton.icon(
-              onPressed: _addNewItemField,
-              icon: const Icon(Icons.add),
-              label:  Text("add_item".tr()),
+            TextFormField(
+              controller: _itemsController,
+              decoration: InputDecoration(
+                labelText: "category_items".tr(),
+                hintText: "category_items_hint".tr(),
+                border: const OutlineInputBorder(),
+                alignLabelWithHint: true,
+              ),
+              maxLines: 5,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return "category_items_warning".tr();
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 16),
             Row(
@@ -181,12 +158,12 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child:  Text("cancel".tr()),
+                  child: Text("cancel".tr()),
                 ),
                 const SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: _saveCategory,
-                  child:  Text("save".tr()),
+                  child: Text("save".tr()),
                 ),
               ],
             ),

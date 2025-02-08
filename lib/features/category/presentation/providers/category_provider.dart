@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/models/category_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 final categoryProvider =
     StateNotifierProvider<CategoryNotifier, List<CategoryModel>>((ref) {
@@ -15,6 +16,7 @@ const String _customCategoriesKey = 'custom_categories';
 
 class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
   late SharedPreferences _prefs;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   
   CategoryNotifier() : super([]) {
     _initPrefs();
@@ -97,18 +99,41 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
     final categoryToPublish = state.firstWhere((cat) => cat.id == id);
     
     try {
-      // TODO: Firebase'e kategoriyi gönder
-      // await FirebaseFirestore.instance
-      //     .collection('categories')
-      //     .add(categoryToPublish.toFirebase());
+      // Kategori custom değilse yayınlamayı reddet
+      if (!categoryToPublish.isCustom) {
+        throw "category_not_custom".tr();
+      }
+      
+      // Firebase'e kategoriyi gönder
+      await _firestore
+          .collection('categories')
+          .doc(categoryToPublish.id)
+          .set(categoryToPublish.toFirebase());
 
       // Başarılı olursa listeden kaldır
       state = state.where((category) => category.id != id).toList();
       await _saveCustomCategories(state);
     } catch (e) {
       print("category_publish_error".tr() + ' $e');
-      // Hata durumunda kullanıcıya bildir
       rethrow;
+    }
+  }
+
+  // Paylaşılan kategorileri getir
+  Future<List<CategoryModel>> getSharedCategories(String language) async {
+    try {
+      final snapshot = await _firestore
+          .collection('categories')
+          .where('language', isEqualTo: language)
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => CategoryModel.fromJson(doc.data()))
+          .toList();
+    } catch (e) {
+      print("shared_categories_load_error".tr() + ' $e');
+      return [];
     }
   }
 } 
