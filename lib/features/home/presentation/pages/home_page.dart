@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:whoami/features/settings/presentation/pages/settings_page.dart';
+
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -44,7 +46,12 @@ class HomePage extends StatelessWidget {
               title: "settings_title".tr(),
               subtitle: "settings_subtitle".tr(),
               onTap: () {
-                // TODO: Navigate to Settings
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsPage(),
+                  ),
+                );
               },
             ),
           ],
