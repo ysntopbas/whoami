@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -29,11 +28,15 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
 
   Future<void> loadCategories(String language) async {
     try {
-      // Varsayılan kategorileri yükle
-      final jsonString = await rootBundle.loadString('assets/categories/$language.json');
-      final List<dynamic> jsonList = json.decode(jsonString);
-      final defaultCategories = jsonList
-          .map((json) => CategoryModel.fromJson(json))
+      // Firebase'den varsayılan kategorileri yükle
+      final snapshot = await _firestore
+          .collection('categories')
+          .where('language', isEqualTo: language)
+          .where('isCustom', isEqualTo: false) // Sadece varsayılan kategorileri al
+          .get();
+
+      final defaultCategories = snapshot.docs
+          .map((doc) => CategoryModel.fromJson(doc.data()))
           .toList();
       
       // Kayıtlı özel kategorileri yükle
@@ -125,6 +128,7 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
       final snapshot = await _firestore
           .collection('categories')
           .where('language', isEqualTo: language)
+          .where('isCustom', isEqualTo: true) // Sadece paylaşılan özel kategorileri al
           .orderBy('createdAt', descending: true)
           .get();
 
