@@ -36,5 +36,6 @@
   "category_publish_loading": "Kategori yayınlanıyor...",
   "error": "Hata",
   "success": "Başarılı",
-  "ok": "Tamam"
+  "ok": "Tamam",
+  "no_recents": "Son kullanılan emoji yok"
 } 

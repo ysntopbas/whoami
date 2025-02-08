@@ -36,5 +36,6 @@
   "category_publish_loading": "Publishing category...",
   "error": "Error",
   "success": "Success",
-  "ok": "OK"
+  "ok": "OK",
+  "no_recents": "No recent emojis"
 } 

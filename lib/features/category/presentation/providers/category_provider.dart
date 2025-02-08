@@ -69,11 +69,16 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
     await _prefs.setString(_customCategoriesKey, customCategoriesJson);
   }
 
-  Future<void> addCategory(String name, List<String> items, String language) async {
+  Future<void> addCategory(
+    String name,
+    List<String> items,
+    String language,
+    String icon,
+  ) async {
     final newCategory = CategoryModel(
       id: const Uuid().v4(),
       name: name,
-      icon: '📝',
+      icon: icon,
       items: items,
       language: language,
       isCustom: true,

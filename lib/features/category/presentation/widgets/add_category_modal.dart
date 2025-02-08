@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/category_provider.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:flutter/foundation.dart' as foundation;
 
 class AddCategoryModal extends ConsumerStatefulWidget {
   const AddCategoryModal({super.key});
@@ -14,6 +16,7 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
   final _formKey = GlobalKey<FormState>();
   final _categoryNameController = TextEditingController();
   final List<TextEditingController> _itemControllers = [TextEditingController()];
+  String _selectedEmoji = '📝'; // Varsayılan emoji
 
   @override
   void dispose() {
@@ -37,6 +40,52 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
     });
   }
 
+  void _showEmojiPicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 300,
+          child: EmojiPicker(
+            onEmojiSelected: (category, emoji) {
+              setState(() {
+                _selectedEmoji = emoji.emoji;
+              });
+              Navigator.pop(context);
+            },
+            config: Config(
+              columns: 7,
+              emojiSizeMax: 32 * (foundation.defaultTargetPlatform == TargetPlatform.iOS ? 1.30 : 1.0),
+              verticalSpacing: 0,
+              horizontalSpacing: 0,
+              gridPadding: EdgeInsets.zero,
+              initCategory: Category.SMILEYS,
+              bgColor: Theme.of(context).scaffoldBackgroundColor,
+              indicatorColor: Theme.of(context).colorScheme.primary,
+              iconColor: Colors.grey,
+              iconColorSelected: Theme.of(context).colorScheme.primary,
+              backspaceColor: Theme.of(context).colorScheme.primary,
+              skinToneDialogBgColor: Colors.white,
+              skinToneIndicatorColor: Colors.grey,
+              enableSkinTones: true,
+              recentTabBehavior: RecentTabBehavior.RECENT,
+              recentsLimit: 28,
+              noRecents: Text(
+                'no_recents'.tr(),
+                style: const TextStyle(fontSize: 20, color: Colors.black26),
+                textAlign: TextAlign.center,
+              ),
+              loadingIndicator: const SizedBox.shrink(),
+              tabIndicatorAnimDuration: kTabScrollDuration,
+              categoryIcons: const CategoryIcons(),
+              buttonMode: ButtonMode.MATERIAL,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _saveCategory() {
     if (_formKey.currentState!.validate()) {
       final items = _itemControllers
@@ -48,6 +97,7 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
             _categoryNameController.text.trim(),
             items,
             Localizations.localeOf(context).languageCode,
+            _selectedEmoji, // Seçilen emojiyi gönder
           );
 
       Navigator.pop(context);
@@ -68,11 +118,27 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Emoji seçici butonu
+            InkWell(
+              onTap: _showEmojiPicker,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                ),
+                child: Text(
+                  _selectedEmoji,
+                  style: const TextStyle(fontSize: 32),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _categoryNameController,
               decoration: InputDecoration(
                 labelText: "category_name".tr(),
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
