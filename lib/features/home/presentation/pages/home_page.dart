@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:whoami/features/settings/presentation/pages/settings_page.dart';
 import 'package:whoami/features/category/presentation/pages/categories_page.dart';
+import 'package:whoami/features/game/presentation/pages/new_game_page.dart';
 
 
 class HomePage extends StatelessWidget {
@@ -27,7 +28,12 @@ class HomePage extends StatelessWidget {
               title: "new_game_title".tr(),
               subtitle: "new_game_subtitle".tr(),
               onTap: () {
-                // TODO: Navigate to New Game
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NewGamePage(),
+                  ),
+                );
               },
             ),
             const SizedBox(height: 16),

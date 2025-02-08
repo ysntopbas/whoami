@@ -43,5 +43,11 @@
   "items_empty_warning": "Lütfen en az bir öğe girin",
   "shared_categories_load_error": "Paylaşılan kategoriler yüklenirken hata oluştu",
   "firebase_connection_error": "Firebase bağlantısı kurulamadı",
-  "category_not_custom": "Sadece kendi oluşturduğunuz kategorileri yayınlayabilirsiniz"
+  "category_not_custom": "Sadece kendi oluşturduğunuz kategorileri yayınlayabilirsiniz",
+  "search_categories": "Kategori ara...",
+  "shared_categories": "Paylaşılan Kategoriler",
+  "no_shared_categories": "Henüz paylaşılan kategori yok",
+  "no_custom_categories": "Henüz özel kategoriniz yok",
+  "all_categories": "Tüm Kategoriler",
+  "categories_load_error": "Kategoriler yüklenirken hata oluştu"
 } 

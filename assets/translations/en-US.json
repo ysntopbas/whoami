@@ -43,5 +43,11 @@
   "no_recents": "No recent emojis",
   "shared_categories_load_error": "Error loading shared categories",
   "firebase_connection_error": "Could not connect to Firebase",
-  "category_not_custom": "You can only publish categories that you created"
+  "category_not_custom": "You can only publish categories that you created",
+  "search_categories": "Search categories...",
+  "shared_categories": "Shared Categories",
+  "no_shared_categories": "No shared categories yet",
+  "no_custom_categories": "No custom categories yet",
+  "all_categories": "All Categories",
+  "categories_load_error": "Error loading categories"
 } 
