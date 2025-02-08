@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:whoami/features/category/domain/models/category_model.dart';
+import 'package:whoami/features/game/presentation/pages/game_play_page.dart';
 
 final playerListProvider = StateNotifierProvider<PlayerListNotifier, List<String>>((ref) {
   return PlayerListNotifier();
@@ -182,7 +183,16 @@ class _GameSettingsPageState extends ConsumerState<GameSettingsPage> {
             ElevatedButton(
               onPressed: players.length >= 2
                   ? () {
-                      // TODO: Oyun sayfasına yönlendir
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GamePlayPage(
+                            category: widget.category,
+                            players: players,
+                            timePerPlayer: _timePerPlayer,
+                          ),
+                        ),
+                      );
                     }
                   : null,
               style: ElevatedButton.styleFrom(

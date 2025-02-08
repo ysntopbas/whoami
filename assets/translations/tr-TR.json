@@ -57,5 +57,11 @@
   "seconds": "saniye",
   "start_game": "Oyunu Başlat",
   "min_players_warning": "En az 2 oyuncu gerekli",
-  "selected_category": "Seçilen Kategori"
+  "selected_category": "Seçilen Kategori",
+  "ready": "Hazır",
+  "next_player": "Sıradaki Oyuncu",
+  "game_over": "Oyun Bitti!",
+  "time_up": "Süre Doldu!",
+  "current_player": "Sıradaki Oyuncu",
+  "tilt_phone_hint": "Doğru için yukarı, yanlış için aşağı eğin"
 } 

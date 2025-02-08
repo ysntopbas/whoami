@@ -41,6 +41,8 @@ dependencies:
   shared_preferences: ^2.2.0  
   emoji_picker_flutter: ^1.6.3
   cloud_firestore: ^5.6.3
+  sensors_plus: ^6.1.1
+  audioplayers: ^6.1.1
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +65,7 @@ flutter:
   assets:
     - assets/translations/
     - assets/categories/
+    
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

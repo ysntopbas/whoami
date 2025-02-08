@@ -57,5 +57,11 @@
   "seconds": "seconds",
   "start_game": "Start Game",
   "min_players_warning": "Minimum 2 players required",
-  "selected_category": "Selected Category"
+  "selected_category": "Selected Category",
+  "ready": "Ready",
+  "next_player": "Next Player",
+  "game_over": "Game Over!",
+  "time_up": "Time's Up!",
+  "current_player": "Current Player",
+  "tilt_phone_hint": "Tilt up for correct, down for wrong"
 } 
