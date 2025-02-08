@@ -62,7 +62,7 @@ class CategoryModel {
       'icon': icon,
       'items': items,
       'language': language,
-      'isCustom': false, // Firebase'e gönderirken false olarak işaretliyoruz
+      'isCustom': true, // Paylaşılan kategoriler true olarak işaretleniyor
       'createdAt': DateTime.now().toIso8601String(),
     };
   }
