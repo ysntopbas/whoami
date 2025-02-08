@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:whoami/features/category/domain/models/category_model.dart';
 import '../providers/category_provider.dart';
 import '../widgets/add_category_modal.dart';
 
@@ -25,6 +26,8 @@ class CategoriesPage extends ConsumerWidget {
     );
 
     final categories = ref.watch(categoryProvider);
+    final defaultCategories = categories.where((c) => !c.isCustom).toList();
+    final customCategories = categories.where((c) => c.isCustom).toList();
     
     return Scaffold(
       appBar: AppBar(
@@ -33,6 +36,7 @@ class CategoriesPage extends ConsumerWidget {
       ),
       body: Column(
         children: [
+          // Default Categories Grid
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(16),
@@ -41,9 +45,9 @@ class CategoriesPage extends ConsumerWidget {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
               ),
-              itemCount: categories.length,
+              itemCount: defaultCategories.length,
               itemBuilder: (context, index) {
-                final category = categories[index];
+                final category = defaultCategories[index];
                 return Card(
                   elevation: 4,
                   child: InkWell(
@@ -63,7 +67,7 @@ class CategoriesPage extends ConsumerWidget {
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         Text(
-                          '${category.items.length}' + " " + "word".tr(),
+                          '${category.items.length} ${"word".tr()}',
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
@@ -73,14 +77,16 @@ class CategoriesPage extends ConsumerWidget {
               },
             ),
           ),
-          if (categories.any((c) => c.isCustom)) ...[
-             Padding(
-              padding: EdgeInsets.all(16.0),
+
+          // Custom Categories Section
+          if (customCategories.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "own_categories".tr(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -90,24 +96,35 @@ class CategoriesPage extends ConsumerWidget {
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),
-                itemCount:
-                    categories.where((c) => c.isCustom).toList().length,
+                itemCount: customCategories.length,
                 itemBuilder: (context, index) {
-                  final customCategory =
-                      categories.where((c) => c.isCustom).toList()[index];
+                  final customCategory = customCategories[index];
                   return Card(
                     child: ListTile(
                       leading: Text(customCategory.icon),
                       title: Text(customCategory.name),
                       subtitle: Text(
-                          '${customCategory.items.length}'+ " " + "word".tr()),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          ref
-                              .read(categoryProvider.notifier)
-                              .deleteCategory(customCategory.id);
-                        },
+                          '${customCategory.items.length} ${"word".tr()}'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.publish),
+                            onPressed: () => _showPublishDialog(
+                              context,
+                              ref,
+                              customCategory,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              ref
+                                  .read(categoryProvider.notifier)
+                                  .deleteCategory(customCategory.id);
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   );
@@ -127,6 +144,35 @@ class CategoriesPage extends ConsumerWidget {
         },
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  Future<void> _showPublishDialog(
+    BuildContext context,
+    WidgetRef ref,
+    CategoryModel category,
+  ) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("publish_warning_title".tr()),
+          content: Text("publish_warning_message".tr()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("no".tr()),
+            ),
+            TextButton(
+              onPressed: () {
+                ref.read(categoryProvider.notifier).publishCategory(category.id);
+                Navigator.of(context).pop();
+              },
+              child: Text("yes".tr()),
+            ),
+          ],
+        );
+      },
     );
   }
 } 

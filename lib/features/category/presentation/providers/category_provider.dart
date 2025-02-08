@@ -52,4 +52,8 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
   void deleteCategory(String id) {
     state = state.where((category) => category.id != id).toList();
   }
+
+  void publishCategory(String id) {
+    state = state.where((category) => category.id != id).toList();
+  }
 } 

@@ -24,9 +24,10 @@
   "name": "Name",
   "category_load_error": "Error loading categories",
   "word": "word",
-  "own_categories": "My Categories"
-
-
-
-
+  "own_categories": "My Categories",
+  "publish_category": "Publish Category",
+  "publish_warning_title": "Publish Category",
+  "publish_warning_message": "Are you sure you want to publish your category? Published categories cannot be deleted or edited.",
+  "yes": "Yes",
+  "no": "No"
 } 

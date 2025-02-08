@@ -24,5 +24,10 @@
   "name": "İsim",
   "category_load_error": "Kategoriler yüklenirken hata oluştu",
   "word": "kelime",
-  "own_categories": "Kendi Kategorilerim"
+  "own_categories": "Kendi Kategorilerim",
+  "publish_category": "Kategoriyi Yayınla",
+  "publish_warning_title": "Kategori Yayınlama",
+  "publish_warning_message": "Kategorinizi yayınlamak istediğinize emin misiniz? Yayınlanan kategori artık silinemez ve düzenlenemez.",
+  "yes": "Evet",
+  "no": "Hayır"
 } 
