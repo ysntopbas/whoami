@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/models/category_model.dart';
@@ -8,29 +10,34 @@ final categoryProvider =
 });
 
 class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
-  CategoryNotifier()
-      : super([
-          // Varsayılan kategoriler
-          CategoryModel(
-            id: '1',
-            name: 'Hayvanlar',
-            icon: '🐾',
-            items: ['Aslan', 'Kaplan', 'Fil'],
-          ),
-          CategoryModel(
-            id: '2',
-            name: 'Meslekler',
-            icon: '👨‍💼',
-            items: ['Doktor', 'Öğretmen', 'Mühendis'],
-          ),
-        ]);
+  CategoryNotifier() : super([]) {
+    loadCategories('tr'); // Varsayılan olarak Türkçe kategorileri yükle
+  }
 
-  void addCategory(String name, List<String> items) {
+  Future<void> loadCategories(String language) async {
+    try {
+      final jsonString = await rootBundle.loadString('assets/categories/$language.json');
+      final List<dynamic> jsonList = json.decode(jsonString);
+      final categories = jsonList
+          .map((json) => CategoryModel.fromJson(json))
+          .toList();
+      
+      // Özel kategorileri koruyarak varsayılan kategorileri güncelle
+      final customCategories = state.where((cat) => cat.isCustom).toList();
+      state = [...categories, ...customCategories];
+    } catch (e) {
+      print('Kategoriler yüklenirken hata oluştu: $e');
+      state = [];
+    }
+  }
+
+  void addCategory(String name, List<String> items, String language) {
     final newCategory = CategoryModel(
       id: const Uuid().v4(),
       name: name,
-      icon: '📝', // Varsayılan icon
+      icon: '📝',
       items: items,
+      language: language,
       isCustom: true,
     );
     state = [...state, newCategory];

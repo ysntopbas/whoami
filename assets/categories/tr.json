@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "name": "Hayvanlar",
+    "icon": "🐾",
+    "items": ["Aslan", "Kaplan", "Fil", "Zürafa", "Penguen"],
+    "language": "tr",
+    "isCustom": false
+  },
+  {
+    "id": "2",
+    "name": "Meslekler",
+    "icon": "👨‍💼",
+    "items": ["Doktor", "Öğretmen", "Mühendis", "Aşçı", "Pilot"],
+    "language": "tr",
+    "isCustom": false
+  },
+  {
+    "id": "3",
+    "name": "Spor",
+    "icon": "⚽",
+    "items": ["Futbol", "Basketbol", "Voleybol", "Tenis", "Yüzme"],
+    "language": "tr",
+    "isCustom": false
+  }
+] 

@@ -46,6 +46,7 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
       ref.read(categoryProvider.notifier).addCategory(
             _categoryNameController.text.trim(),
             items,
+            Localizations.localeOf(context).languageCode,
           );
 
       Navigator.pop(context);

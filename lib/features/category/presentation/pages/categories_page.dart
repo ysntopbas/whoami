@@ -9,6 +9,16 @@ class CategoriesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Dil değişikliğini dinle ve kategorileri güncelle
+    ref.listen<Locale>(
+      Provider((ref) => context.locale),
+      (previous, next) {
+        if (previous?.languageCode != next.languageCode) {
+          ref.read(categoryProvider.notifier).loadCategories(next.languageCode);
+        }
+      },
+    );
+
     final categories = ref.watch(categoryProvider);
 
     return Scaffold(

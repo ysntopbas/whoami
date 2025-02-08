@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "name": "Animals",
+    "icon": "🐾",
+    "items": ["Lion", "Tiger", "Elephant", "Giraffe", "Penguin"],
+    "language": "en",
+    "isCustom": false
+  },
+  {
+    "id": "2",
+    "name": "Professions",
+    "icon": "👨‍💼",
+    "items": ["Doctor", "Teacher", "Engineer", "Chef", "Pilot"],
+    "language": "en",
+    "isCustom": false
+  },
+  {
+    "id": "3",
+    "name": "Sports",
+    "icon": "⚽",
+    "items": ["Football", "Basketball", "Volleyball", "Tennis", "Swimming"],
+    "language": "en",
+    "isCustom": false
+  }
+] 
