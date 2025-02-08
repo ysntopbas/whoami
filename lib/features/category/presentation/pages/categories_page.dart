@@ -9,7 +9,12 @@ class CategoriesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Dil değişikliğini dinle ve kategorileri güncelle
+    // initState benzeri bir etki için
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(categoryProvider.notifier).loadCategories(context.locale.languageCode);
+    });
+
+    // Dil değişikliğini dinle
     ref.listen<Locale>(
       Provider((ref) => context.locale),
       (previous, next) {
@@ -20,7 +25,7 @@ class CategoriesPage extends ConsumerWidget {
     );
 
     final categories = ref.watch(categoryProvider);
-
+    
     return Scaffold(
       appBar: AppBar(
         title: Text('categories_title'.tr()),

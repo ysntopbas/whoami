@@ -22,12 +22,17 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
           .map((json) => CategoryModel.fromJson(json))
           .toList();
       
-      // Özel kategorileri koruyarak varsayılan kategorileri güncelle
-      final customCategories = state.where((cat) => cat.isCustom).toList();
+      // Mevcut dildeki özel kategorileri al
+      final customCategories = state.where((cat) => 
+        cat.isCustom && cat.language == language
+      ).toList();
+      
       state = [...categories, ...customCategories];
     } catch (e) {
       print('Kategoriler yüklenirken hata oluştu: $e');
-      state = [];
+      // Hata durumunda mevcut özel kategorileri koru
+      final customCategories = state.where((cat) => cat.isCustom).toList();
+      state = [...customCategories];
     }
   }
 
