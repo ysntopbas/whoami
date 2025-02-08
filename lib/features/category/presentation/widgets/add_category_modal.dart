@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/category_provider.dart';
@@ -69,13 +70,13 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
           children: [
             TextFormField(
               controller: _categoryNameController,
-              decoration: const InputDecoration(
-                labelText: 'Kategori Adı',
+              decoration: InputDecoration(
+                labelText: "category_name".tr(),
                 border: OutlineInputBorder(),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Kategori adı boş olamaz';
+                  return "category_name_warning".tr();
                 }
                 return null;
               },
@@ -90,7 +91,7 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
                       child: TextFormField(
                         controller: _itemControllers[index],
                         decoration: InputDecoration(
-                          labelText: 'İsim ${index + 1}',
+                          labelText: '${"name".tr()} ${index + 1}',
                           border: const OutlineInputBorder(),
                         ),
                       ),
@@ -106,7 +107,7 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
             TextButton.icon(
               onPressed: _addNewItemField,
               icon: const Icon(Icons.add),
-              label: const Text('Yeni İsim Ekle'),
+              label:  Text("add_item".tr()),
             ),
             const SizedBox(height: 16),
             Row(
@@ -114,12 +115,12 @@ class _AddCategoryModalState extends ConsumerState<AddCategoryModal> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('İptal'),
+                  child:  Text("cancel".tr()),
                 ),
                 const SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: _saveCategory,
-                  child: const Text('Kaydet'),
+                  child:  Text("save".tr()),
                 ),
               ],
             ),

@@ -11,6 +11,22 @@
   "settings_title": "Settings",
   "new_game_subtitle": "Start playing now",
   "categories_subtitle": "Create new categories",
-  "settings_subtitle": "Edit game settings"
+  "settings_subtitle": "Edit game settings",
+  "add_category": "Add Category",
+  "category_name": "Category Name",
+  "category_items": "Category Items",
+  "add_item": "Add Item",
+  "delete_category": "Delete Category",
+  "delete_item": "Delete Item",
+  "cancel": "Cancel",
+  "save": "Save",
+  "category_name_warning": "Category name cannot be empty",
+  "name": "Name",
+  "category_load_error": "Error loading categories",
+  "word": "word",
+  "own_categories": "My Categories"
+
+
+
 
 } 

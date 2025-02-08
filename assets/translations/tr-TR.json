@@ -11,6 +11,18 @@
   "settings_title": "Ayarlar",
   "new_game_subtitle": "Hemen oynamaya başla",
   "categories_subtitle": "Yeni kategoriler oluştur",
-  "settings_subtitle": "Oyun ayarlarını düzenle"
-
+  "settings_subtitle": "Oyun ayarlarını düzenle",
+  "add_category": "Kategori Ekle",
+  "category_name": "Kategori Adı",
+  "category_items": "Kategori Öğeleri",
+  "add_item": "Öğe Ekle",
+  "delete_category": "Kategori Sil",
+  "delete_item": "Öğe Sil",
+  "cancel": "İptal",
+  "save": "Kaydet",
+  "category_name_warning": "Kategori adı boş olamaz",
+  "name": "İsim",
+  "category_load_error": "Kategoriler yüklenirken hata oluştu",
+  "word": "kelime",
+  "own_categories": "Kendi Kategorilerim"
 } 

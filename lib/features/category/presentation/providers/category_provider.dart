@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
@@ -29,7 +30,7 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
       
       state = [...categories, ...customCategories];
     } catch (e) {
-      print('Kategoriler yüklenirken hata oluştu: $e');
+      print("category_load_error".tr() + ' $e');
       // Hata durumunda mevcut özel kategorileri koru
       final customCategories = state.where((cat) => cat.isCustom).toList();
       state = [...customCategories];

@@ -63,7 +63,7 @@ class CategoriesPage extends ConsumerWidget {
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         Text(
-                          '${category.items.length} kelime',
+                          '${category.items.length}' + " " + "word".tr(),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
@@ -74,12 +74,12 @@ class CategoriesPage extends ConsumerWidget {
             ),
           ),
           if (categories.any((c) => c.isCustom)) ...[
-            const Padding(
+             Padding(
               padding: EdgeInsets.all(16.0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Kendi Kategorilerim',
+                  "own_categories".tr(),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -100,7 +100,7 @@ class CategoriesPage extends ConsumerWidget {
                       leading: Text(customCategory.icon),
                       title: Text(customCategory.name),
                       subtitle: Text(
-                          '${customCategory.items.length} kelime'),
+                          '${customCategory.items.length}'+ " " + "word".tr()),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {
