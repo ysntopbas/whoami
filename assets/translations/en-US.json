@@ -1,0 +1,16 @@
+{
+  "app_name": "Who Am I?",
+  "new_game": "New Game",
+  "categories": "Categories",
+  "settings": "Settings",
+  "language": "Language",
+  "turkish": "Turkish",
+  "english": "English",
+  "new_game_title": "New Game",
+  "categories_title": "Categories",
+  "settings_title": "Settings",
+  "new_game_subtitle": "Start playing now",
+  "categories_subtitle": "Create new categories",
+  "settings_subtitle": "Edit game settings"
+
+} 
