@@ -29,5 +29,12 @@
   "publish_warning_title": "Kategori Yayınlama",
   "publish_warning_message": "Kategorinizi yayınlamak istediğinize emin misiniz? Yayınlanan kategori artık silinemez ve düzenlenemez.",
   "yes": "Evet",
-  "no": "Hayır"
+  "no": "Hayır",
+  "custom_categories_load_error": "Özel kategoriler yüklenirken hata oluştu",
+  "category_publish_error": "Kategori yayınlanırken hata oluştu",
+  "category_publish_success": "Kategori başarıyla yayınlandı",
+  "category_publish_loading": "Kategori yayınlanıyor...",
+  "error": "Hata",
+  "success": "Başarılı",
+  "ok": "Tamam"
 } 

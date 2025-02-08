@@ -160,13 +160,44 @@ class CategoriesPage extends ConsumerWidget {
           content: Text("publish_warning_message".tr()),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.pop(context),
               child: Text("no".tr()),
             ),
             TextButton(
-              onPressed: () {
-                ref.read(categoryProvider.notifier).publishCategory(category.id);
-                Navigator.of(context).pop();
+              onPressed: () async {
+                Navigator.pop(context);
+                try {
+                  // Yükleniyor göster
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("category_publish_loading".tr())),
+                  );
+                  
+                  await ref.read(categoryProvider.notifier).publishCategory(category.id);
+                  
+                  // Başarılı mesajı göster
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("category_publish_success".tr())),
+                    );
+                  }
+                } catch (e) {
+                  // Hata mesajı göster
+                  if (context.mounted) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text("error".tr()),
+                        content: Text(e.toString()),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text("ok".tr()),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                }
               },
               child: Text("yes".tr()),
             ),

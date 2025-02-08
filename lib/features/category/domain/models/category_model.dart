@@ -53,4 +53,17 @@ class CategoryModel {
       'isCustom': isCustom,
     };
   }
+
+  // Firebase'e gönderilecek format için toFirebase metodu
+  Map<String, dynamic> toFirebase() {
+    return {
+      'id': id,
+      'name': name,
+      'icon': icon,
+      'items': items,
+      'language': language,
+      'isCustom': false, // Firebase'e gönderirken false olarak işaretliyoruz
+      'createdAt': DateTime.now().toIso8601String(),
+    };
+  }
 } 

@@ -29,5 +29,12 @@
   "publish_warning_title": "Publish Category",
   "publish_warning_message": "Are you sure you want to publish your category? Published categories cannot be deleted or edited.",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "custom_categories_load_error": "Error loading custom categories",
+  "category_publish_error": "Error publishing category",
+  "category_publish_success": "Category published successfully",
+  "category_publish_loading": "Publishing category...",
+  "error": "Error",
+  "success": "Success",
+  "ok": "OK"
 } 
