@@ -34,6 +34,10 @@ class _GamePlayPageState extends State<GamePlayPage> {
   int _countdown = 3;
   late int _remainingTime;
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
+  bool _canEvaluate = true;
+  bool _waitingForReset = false;
+  Timer? _evaluationTimer;
+  double _lastZValue = 0;
 
   @override
   void initState() {
@@ -49,10 +53,13 @@ class _GamePlayPageState extends State<GamePlayPage> {
 
   @override
   void dispose() {
+    _evaluationTimer?.cancel();
     _accelerometerSubscription?.cancel();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
     ]);
     super.dispose();
   }
@@ -82,20 +89,49 @@ class _GamePlayPageState extends State<GamePlayPage> {
       _isCountingDown = false;
       _isPlaying = true;
       _currentWord = _getRandomWord();
+      _canEvaluate = true;
+      _waitingForReset = false;
+      _lastZValue = 0;
     });
 
-    // İvmeölçer dinlemeye başla
-    _accelerometerSubscription = accelerometerEvents.listen((event) {
-      if (event.z.abs() > 12) { // Telefon yukarı/aşağı hareket
-        if (event.z > 0) {
-          _handleCorrect();
-        } else {
-          _handleWrong();
-        }
+    // Accelerometer dinlemeye başla
+    _accelerometerSubscription = SensorsPlatform.instance
+        .accelerometerEventStream()
+        .listen((event) {
+      if (!_canEvaluate || !_isPlaying) return;
+
+      final zValue = event.z;
+      
+      // Eğer düz konuma dönüş bekliyorsak ve telefon düz konuma geldiyse
+      if (_waitingForReset && zValue > -6 && zValue < 6) {
+        setState(() {
+          _waitingForReset = false;  // Düz konuma geldi, yeni değerlendirmelere hazır
+          _canEvaluate = true;
+        });
+        return;
       }
+
+      // Düz konuma dönüş bekliyorsak yeni değerlendirme yapma
+      if (_waitingForReset) return;
+
+      // Doğru için: Z >= 7.51
+      if (zValue >= 7.51) {
+        _startEvaluationTimer(() {
+          _handleCorrect();
+          setState(() => _waitingForReset = true);  // Düz konuma dönüş bekle
+        });
+      }
+      // Yanlış için: Z <= -7.51
+      else if (zValue <= -7.51) {
+        _startEvaluationTimer(() {
+          _handleWrong();
+          setState(() => _waitingForReset = true);  // Düz konuma dönüş bekle
+        });
+      }
+      
+      _lastZValue = zValue;
     });
 
-    // Zamanlayıcı başlat
     _startTimer();
   }
 
@@ -111,6 +147,17 @@ class _GamePlayPageState extends State<GamePlayPage> {
       } else {
         _nextPlayer();
         return false;
+      }
+    });
+  }
+
+  void _startEvaluationTimer(VoidCallback action) {
+    // Eğer timer zaten çalışıyorsa yeni timer başlatma
+    if (_evaluationTimer?.isActive ?? false) return;
+
+    _evaluationTimer = Timer(const Duration(milliseconds: 600), () {
+      if (mounted && _isPlaying) {
+        action();
       }
     });
   }
