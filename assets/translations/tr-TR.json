@@ -79,5 +79,9 @@
   "remove_category": "Kategoriyi Kaldır",
   "remove_category_confirm": "Bu kategoriyi cihazınızdan kaldırmak istediğinize emin misiniz?",
   "category_removed": "Kategori cihazdan kaldırıldı",
-  "remove": "Kaldır"
+  "remove": "Kaldır",
+  "toggle_like_error": "Beğeni işlemi sırasında hata oluştu",
+  "toggle_dislike_error": "Beğenmeme işlemi sırasında hata oluştu",
+  "likes": "Beğeni",
+  "dislikes": "Beğenmeme"
 } 

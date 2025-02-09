@@ -203,4 +203,90 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
     // Yerel depolamayı güncelle
     await _saveCustomCategories(state);
   }
+
+  Future<void> toggleLike(String categoryId) async {
+    try {
+      final categoryRef = _firestore.collection('categories').doc(categoryId);
+      final category = state.firstWhere((cat) => cat.id == categoryId);
+
+      if (category.isDisliked) {
+        // Önce dislike'ı kaldır
+        await categoryRef.update({
+          'dislikes': FieldValue.increment(-1),
+        });
+      }
+
+      if (category.isLiked) {
+        // Like'ı kaldır
+        await categoryRef.update({
+          'likes': FieldValue.increment(-1),
+        });
+        state = state.map((cat) => cat.id == categoryId
+            ? cat.copyWith(
+                isLiked: false,
+                likes: cat.likes - 1,
+                isDisliked: false,
+              )
+            : cat).toList();
+      } else {
+        // Like ekle
+        await categoryRef.update({
+          'likes': FieldValue.increment(1),
+        });
+        state = state.map((cat) => cat.id == categoryId
+            ? cat.copyWith(
+                isLiked: true,
+                likes: cat.likes + 1,
+                isDisliked: false,
+              )
+            : cat).toList();
+      }
+      await _saveCustomCategories(state);
+    } catch (e) {
+      print('toggle_like_error'.tr() + ' $e');
+    }
+  }
+
+  Future<void> toggleDislike(String categoryId) async {
+    try {
+      final categoryRef = _firestore.collection('categories').doc(categoryId);
+      final category = state.firstWhere((cat) => cat.id == categoryId);
+
+      if (category.isLiked) {
+        // Önce like'ı kaldır
+        await categoryRef.update({
+          'likes': FieldValue.increment(-1),
+        });
+      }
+
+      if (category.isDisliked) {
+        // Dislike'ı kaldır
+        await categoryRef.update({
+          'dislikes': FieldValue.increment(-1),
+        });
+        state = state.map((cat) => cat.id == categoryId
+            ? cat.copyWith(
+                isDisliked: false,
+                dislikes: cat.dislikes - 1,
+                isLiked: false,
+              )
+            : cat).toList();
+      } else {
+        // Dislike ekle
+        await categoryRef.update({
+          'dislikes': FieldValue.increment(1),
+        });
+        state = state.map((cat) => cat.id == categoryId
+            ? cat.copyWith(
+                isDisliked: true,
+                dislikes: cat.dislikes + 1,
+                isLiked: false,
+              )
+            : cat).toList();
+      }
+      await _saveCustomCategories(state);
+    } catch (e) {
+      print('toggle_dislike_error'.tr() + ' $e');
+    }
+  }
 } 

@@ -102,69 +102,175 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
         crossAxisCount: 2,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
-        childAspectRatio: 1.2,
+        childAspectRatio: 0.85,
       ),
       itemCount: categories.length,
       itemBuilder: (context, index) {
-        final category = categories[index];
-        return Card(
-          color: Colors.grey[100], // Soluk ton
-          child: InkWell(
-            onTap: () async {
-              try {
-                await ref.read(categoryProvider.notifier).downloadCategory(category);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('category_downloaded'.tr())),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('category_download_error'.tr())),
-                  );
-                }
-              }
-            },
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+        return _buildCategoryCard(categories[index], isDownloadable: true);
+      },
+    );
+  }
+
+  Widget _buildCategoryCard(CategoryModel category, {bool isDownloadable = false}) {
+    return Card(
+      elevation: 2,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: isDownloadable ? Colors.grey[50] : Colors.white,
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      category.icon,
+                      style: const TextStyle(fontSize: 32),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      category.name,
+                      style: Theme.of(context).textTheme.titleMedium,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      '${category.items.length} ${"word".tr()}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: Theme.of(context).dividerColor,
+                    width: 0.5,
+                  ),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Like butonu ve sayısı
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        category.icon,
-                        style: const TextStyle(fontSize: 32),
+                      IconButton(
+                        iconSize: 20,
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(8),
+                        icon: Icon(
+                          category.isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                          color: category.isLiked ? Colors.blue : Colors.grey,
+                        ),
+                        onPressed: () {
+                          ref.read(categoryProvider.notifier).toggleLike(category.id);
+                        },
                       ),
-                      const SizedBox(height: 8),
                       Text(
-                        category.name,
-                        style: Theme.of(context).textTheme.titleMedium,
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        '${category.items.length} ${"word".tr()}',
+                        category.likes.toString(),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
                   ),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Icon(
-                    Icons.download,
-                    color: Theme.of(context).colorScheme.primary,
+                  // Dislike butonu ve sayısı
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        iconSize: 20,
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(8),
+                        icon: Icon(
+                          category.isDisliked ? Icons.thumb_down : Icons.thumb_down_outlined,
+                          color: category.isDisliked ? Colors.red : Colors.grey,
+                        ),
+                        onPressed: () {
+                          ref.read(categoryProvider.notifier).toggleDislike(category.id);
+                        },
+                      ),
+                      Text(
+                        category.dislikes.toString(),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  // İndirme/Silme butonu
+                  if (isDownloadable)
+                    IconButton(
+                      iconSize: 20,
+                      constraints: const BoxConstraints(),
+                      padding: const EdgeInsets.all(8),
+                      icon: const Icon(Icons.download),
+                      color: Theme.of(context).colorScheme.primary,
+                      onPressed: () async {
+                        await ref.read(categoryProvider.notifier).downloadCategory(category);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('category_downloaded'.tr())),
+                          );
+                        }
+                      },
+                    )
+                  else if (category.isDownloaded)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          iconSize: 20,
+                          constraints: const BoxConstraints(),
+                          padding: const EdgeInsets.all(8),
+                          icon: const Icon(Icons.delete_outline),
+                          color: Theme.of(context).colorScheme.error,
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('remove_category'.tr()),
+                                content: Text('remove_category_confirm'.tr()),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text('cancel'.tr()),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      ref.read(categoryProvider.notifier)
+                                          .removeDownloadedCategory(category.id);
+                                      Navigator.pop(context);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('category_removed'.tr())),
+                                      );
+                                    },
+                                    child: Text(
+                                      'remove'.tr(),
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.error,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 
@@ -190,85 +296,156 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
         crossAxisCount: 2,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
-        childAspectRatio: 1.2,
+        childAspectRatio: 0.85,
       ),
       itemCount: categories.length,
       itemBuilder: (context, index) {
         final category = categories[index];
         return Card(
-          child: Stack(
-            children: [
-              InkWell(
-                onTap: () {
-                  // TODO: Kategori detay sayfasına git
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+          elevation: 2,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Stack(
                     children: [
-                      Text(
-                        category.icon,
-                        style: const TextStyle(fontSize: 32),
+                      // Ana içerik
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              category.icon,
+                              style: const TextStyle(fontSize: 32),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              category.name,
+                              style: Theme.of(context).textTheme.titleMedium,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              '${category.items.length} ${"word".tr()}',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        category.name,
-                        style: Theme.of(context).textTheme.titleMedium,
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      // Silme butonu (eğer indirilmiş kategoriyse)
+                      if (isDownloaded)
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: Text('remove_category'.tr()),
+                                  content: Text('remove_category_confirm'.tr()),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text('cancel'.tr()),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        ref.read(categoryProvider.notifier)
+                                            .removeDownloadedCategory(category.id);
+                                        Navigator.pop(context);
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('category_removed'.tr()),
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        'remove'.tr(),
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.error,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                // Like/Dislike bölümü
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: Theme.of(context).dividerColor,
+                        width: 0.5,
                       ),
-                      Text(
-                        '${category.items.length} ${"word".tr()}',
-                        style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // Like butonu ve sayısı
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            iconSize: 20,
+                            constraints: const BoxConstraints(),
+                            padding: const EdgeInsets.all(8),
+                            icon: Icon(
+                              category.isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                              color: category.isLiked ? Colors.blue : Colors.grey,
+                            ),
+                            onPressed: () {
+                              ref.read(categoryProvider.notifier).toggleLike(category.id);
+                            },
+                          ),
+                          Text(
+                            category.likes.toString(),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                      // Dislike butonu ve sayısı
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            iconSize: 20,
+                            constraints: const BoxConstraints(),
+                            padding: const EdgeInsets.all(8),
+                            icon: Icon(
+                              category.isDisliked ? Icons.thumb_down : Icons.thumb_down_outlined,
+                              color: category.isDisliked ? Colors.red : Colors.grey,
+                            ),
+                            onPressed: () {
+                              ref.read(categoryProvider.notifier).toggleDislike(category.id);
+                            },
+                          ),
+                          Text(
+                            category.dislikes.toString(),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-              ),
-              if (isDownloaded)
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text('remove_category'.tr()),
-                          content: Text('remove_category_confirm'.tr()),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: Text('cancel'.tr()),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                ref.read(categoryProvider.notifier)
-                                    .removeDownloadedCategory(category.id);
-                                Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('category_removed'.tr()),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                'remove'.tr(),
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.error,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -283,35 +460,7 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
       itemCount: categories.length,
       itemBuilder: (context, index) {
         final customCategory = categories[index];
-        return Card(
-          child: ListTile(
-            leading: Text(customCategory.icon),
-            title: Text(customCategory.name),
-            subtitle: Text(
-                '${customCategory.items.length} ${"word".tr()}'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.publish),
-                  onPressed: () => _showPublishDialog(
-                    context,
-                    ref,
-                    customCategory,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    ref
-                        .read(categoryProvider.notifier)
-                        .deleteCategory(customCategory.id);
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
+        return _buildCategoryCard(customCategory);
       },
     );
   }
