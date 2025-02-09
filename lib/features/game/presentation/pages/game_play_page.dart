@@ -7,8 +7,8 @@ import 'dart:math';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:whoami/features/category/domain/models/category_model.dart';
 import 'package:whoami/features/game/domain/models/player_score_model.dart';
-import 'package:whoami/features/game/presentation/pages/game_results_page.dart';
 import 'package:whoami/core/utils/orientation_manager.dart';
+import 'package:whoami/features/game/presentation/pages/game_over_page.dart';
 
 class GamePlayPage extends StatefulWidget {
   final CategoryModel category;
@@ -42,6 +42,7 @@ class _GamePlayPageState extends State<GamePlayPage> {
   Timer? _evaluationTimer;
   double _lastZValue = 0; //This value is used to check if the phone is in the correct position.Don't delete this.
   late List<PlayerScore> _playerScores;
+  Timer? _gameTimer;  // Timer'ı tutmak için değişken ekleyelim
 
   @override
   void initState() {
@@ -59,10 +60,10 @@ class _GamePlayPageState extends State<GamePlayPage> {
 
   @override
   void dispose() {
-    // Oyun sayfasından çıkınca dikey mod
-    OrientationManager.forcePortrait();
+    _gameTimer?.cancel();  // Timer'ı temizle
     _evaluationTimer?.cancel();
     _accelerometerSubscription?.cancel();
+    OrientationManager.forcePortrait();
     super.dispose();
   }
 
@@ -138,18 +139,21 @@ class _GamePlayPageState extends State<GamePlayPage> {
   }
 
   void _startTimer() {
-    Future.doWhile(() async {
-      if (!mounted || !_isPlaying) return false;
-      
-      await Future.delayed(const Duration(seconds: 1));
-      
-      if (_remainingTime > 0) {
-        setState(() => _remainingTime--);
-        return true;
-      } else {
-        _nextPlayer();
-        return false;
+    _gameTimer?.cancel();  // Varsa önceki timer'ı iptal et
+    _gameTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
       }
+
+      setState(() {
+        if (_remainingTime > 0) {
+          _remainingTime--;
+        } else {
+          timer.cancel();
+          _nextPlayer();
+        }
+      });
     });
   }
 
@@ -198,10 +202,13 @@ class _GamePlayPageState extends State<GamePlayPage> {
   }
 
   void _nextPlayer() {
+    _gameTimer?.cancel();  // Oyuncu değişirken timer'ı durdur
     _accelerometerSubscription?.cancel();
+    
+    if (!mounted) return;  // mounted kontrolü ekle
+    
     setState(() {
       if (_currentPlayerIndex == widget.players.length - 1) {
-        // Tüm oyuncular bitti, sonuç ekranını göster
         _showGameResults();
       } else {
         _currentPlayerIndex = (_currentPlayerIndex + 1);
@@ -215,10 +222,12 @@ class _GamePlayPageState extends State<GamePlayPage> {
   }
 
   void _showGameResults() {
+    if (!mounted) return;  // mounted kontrolü ekle
+    
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => GameResultsPage(
+        builder: (context) => GameOverPage(
           scores: _playerScores,
           category: widget.category,
           timePerPlayer: widget.timePerPlayer,

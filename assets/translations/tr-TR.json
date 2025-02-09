@@ -69,5 +69,6 @@
   "total": "Toplam: {}",
   "main_menu": "Ana Menü",
   "play_again": "Tekrar Oyna",
-  "winner": "Kazanan"
+  "winner": "Kazanan",
+  "show_results": "Sonuçları Göster"
 } 

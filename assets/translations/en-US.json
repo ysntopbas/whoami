@@ -69,5 +69,6 @@
   "total": "Total: {}",
   "main_menu": "Main Menu",
   "play_again": "Play Again",
-  "winner": "Winner"
+  "winner": "Winner",
+  "show_results": "Show Results"
 } 

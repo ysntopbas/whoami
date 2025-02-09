@@ -43,7 +43,8 @@ dependencies:
   cloud_firestore: ^5.6.3
   sensors_plus: ^6.1.1
   audioplayers: ^6.1.1
-  confetti: ^0.7.0
+  confetti: ^0.8.0
+  
 
 dev_dependencies:
   flutter_test:

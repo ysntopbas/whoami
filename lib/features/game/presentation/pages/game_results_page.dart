@@ -1,9 +1,9 @@
 import 'dart:math';
 
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:confetti/confetti.dart';
 import 'package:whoami/features/category/domain/models/category_model.dart';
 import 'package:whoami/features/game/domain/models/player_score_model.dart';
 import 'package:whoami/features/home/presentation/pages/home_page.dart';
@@ -39,7 +39,7 @@ class _GameResultsPageState extends State<GameResultsPage> {
       DeviceOrientation.portraitDown,
     ]);
     
-    _confettiController = ConfettiController(duration: const Duration(seconds: 5));
+    _confettiController = ConfettiController(duration: const Duration(seconds: 10));
     // Konfeti efektini başlat
     _confettiController.play();
   }
@@ -72,13 +72,62 @@ class _GameResultsPageState extends State<GameResultsPage> {
             alignment: Alignment.topCenter,
             child: ConfettiWidget(
               confettiController: _confettiController,
-              blastDirection: pi / 2,
+              blastDirectionality: BlastDirectionality.explosive,
+              particleDrag: 0.05,
+              emissionFrequency: 0.02,
+              numberOfParticles: 20,
+              gravity: 0.1,
+              shouldLoop: false,
+              colors: const [
+                Colors.green,
+                Colors.blue,
+                Colors.pink,
+                Colors.orange,
+                Colors.purple,
+                Colors.red,
+                Colors.yellow,
+              ],
+              createParticlePath: (size) {
+                var path = Path();
+                path.addOval(Rect.fromCircle(
+                  center: Offset.zero,
+                  radius: 4,
+                ));
+                return path;
+              },
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirection: 0,
+              emissionFrequency: 0.02,
+              numberOfParticles: 10,
               maxBlastForce: 5,
               minBlastForce: 2,
-              emissionFrequency: 0.05,
-              numberOfParticles: 50,
-              gravity: 0.2,
-              shouldLoop: true,
+              gravity: 0.1,
+              shouldLoop: false,
+              colors: const [
+                Colors.green,
+                Colors.blue,
+                Colors.pink,
+                Colors.orange,
+                Colors.purple,
+              ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirection: pi,
+              emissionFrequency: 0.02,
+              numberOfParticles: 10,
+              maxBlastForce: 5,
+              minBlastForce: 2,
+              gravity: 0.1,
+              shouldLoop: false,
               colors: const [
                 Colors.green,
                 Colors.blue,
