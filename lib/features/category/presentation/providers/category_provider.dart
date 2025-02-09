@@ -28,21 +28,30 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
 
   Future<void> loadCategories(String language) async {
     try {
-      // Firebase'den varsayılan kategorileri yükle
+      // Firebase'den tüm kategorileri yükle (varsayılan ve paylaşılan)
       final snapshot = await _firestore
           .collection('categories')
           .where('language', isEqualTo: language)
-          .where('isCustom', isEqualTo: false) // Sadece varsayılan kategorileri al
           .get();
 
-      final defaultCategories = snapshot.docs
+      final firebaseCategories = snapshot.docs
           .map((doc) => CategoryModel.fromJson(doc.data()))
           .toList();
-      
-      // Kayıtlı özel kategorileri yükle
+
+      // Yerel kayıtlı özel kategorileri yükle
       final customCategories = await _loadCustomCategories(language);
       
-      state = [...defaultCategories, ...customCategories];
+      // İndirilmiş kategorileri filtrele
+      final downloadedCategories = firebaseCategories
+          .where((cat) => cat.isCustom && cat.isDownloaded)
+          .toList();
+
+      // Varsayılan kategorileri filtrele
+      final defaultCategories = firebaseCategories
+          .where((cat) => !cat.isCustom)
+          .toList();
+
+      state = [...defaultCategories, ...customCategories, ...downloadedCategories];
     } catch (e) {
       print("category_load_error".tr() + ' $e');
       final customCategories = await _loadCustomCategories(language);
@@ -139,5 +148,59 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
       print("shared_categories_load_error".tr() + ' $e');
       return [];
     }
+  }
+
+  Future<void> downloadCategory(CategoryModel category) async {
+    // Kategoriyi indirilenler listesine ekle
+    final downloadedCategory = category.copyWith(isDownloaded: true);
+    state = [...state, downloadedCategory];
+    await _saveCustomCategories(state);
+  }
+
+  // Kategorileri türlerine göre filtreleme metodları
+  List<CategoryModel> getDefaultCategories() {
+    return state.where((cat) => !cat.isCustom && !cat.isDownloaded).toList();
+  }
+
+  List<CategoryModel> getCustomCategories() {
+    return state.where((cat) => cat.isCustom).toList();
+  }
+
+  List<CategoryModel> getDownloadedCategories() {
+    return state.where((cat) => cat.isDownloaded).toList();
+  }
+
+  // İndirilebilir kategorileri getir (henüz indirilmemiş paylaşılan kategoriler)
+  Future<List<CategoryModel>> getDownloadableCategories(String language) async {
+    try {
+      final snapshot = await _firestore
+          .collection('categories')
+          .where('language', isEqualTo: language)
+          .where('isCustom', isEqualTo: true)
+          .get();
+
+      final downloadableCategories = snapshot.docs
+          .map((doc) => CategoryModel.fromJson(doc.data()))
+          .where((category) => 
+            // Henüz indirilmemiş kategorileri filtrele
+            !state.any((stateCategory) => 
+              stateCategory.id == category.id && stateCategory.isDownloaded
+            )
+          )
+          .toList();
+
+      return downloadableCategories;
+    } catch (e) {
+      print("downloadable_categories_load_error".tr() + ' $e');
+      return [];
+    }
+  }
+
+  // İndirilmiş kategoriyi cihazdan kaldır
+  Future<void> removeDownloadedCategory(String categoryId) async {
+    // Kategoriyi state'den kaldır ve isDownloaded'ı false yap
+    state = state.where((cat) => cat.id != categoryId).toList();
+    // Yerel depolamayı güncelle
+    await _saveCustomCategories(state);
   }
 } 

@@ -70,5 +70,14 @@
   "main_menu": "Main Menu",
   "play_again": "Play Again",
   "winner": "Winner",
-  "show_results": "Show Results"
+  "show_results": "Show Results",
+  "downloadable_categories": "Downloadable Categories",
+  "downloaded_categories": "Downloaded Categories",
+  "category_downloaded": "Category downloaded successfully",
+  "no_downloadable_categories": "No downloadable categories found",
+  "category_download_error": "Error downloading category",
+  "remove_category": "Remove Category",
+  "remove_category_confirm": "Are you sure you want to remove this category from your device?",
+  "category_removed": "Category removed from device",
+  "remove": "Remove"
 } 

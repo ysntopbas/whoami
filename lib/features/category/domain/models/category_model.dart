@@ -4,6 +4,7 @@ class CategoryModel {
   final String icon;
   final List<String> items;
   final bool isCustom;
+  final bool isDownloaded;
   final String language;
 
   CategoryModel({
@@ -13,6 +14,7 @@ class CategoryModel {
     required this.items,
     required this.language,
     this.isCustom = false,
+    this.isDownloaded = false,
   });
 
   CategoryModel copyWith({
@@ -20,6 +22,7 @@ class CategoryModel {
     String? icon,
     List<String>? items,
     bool? isCustom,
+    bool? isDownloaded,
     String? language,
   }) {
     return CategoryModel(
@@ -28,6 +31,7 @@ class CategoryModel {
       icon: icon ?? this.icon,
       items: items ?? this.items,
       isCustom: isCustom ?? this.isCustom,
+      isDownloaded: isDownloaded ?? this.isDownloaded,
       language: language ?? this.language,
     );
   }
@@ -40,6 +44,7 @@ class CategoryModel {
       items: List<String>.from(json['items'] as List),
       language: json['language'] as String,
       isCustom: json['isCustom'] as bool? ?? false,
+      isDownloaded: json['isDownloaded'] as bool? ?? false,
     );
   }
 
@@ -51,6 +56,7 @@ class CategoryModel {
       'items': items,
       'language': language,
       'isCustom': isCustom,
+      'isDownloaded': isDownloaded,
     };
   }
 
