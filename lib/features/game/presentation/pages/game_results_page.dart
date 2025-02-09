@@ -65,92 +65,22 @@ class _GameResultsPageState extends State<GameResultsPage> {
     final winner = sortedScores.first;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          // Konfeti efekti
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirectionality: BlastDirectionality.explosive,
-              particleDrag: 0.05,
-              emissionFrequency: 0.02,
-              numberOfParticles: 20,
-              gravity: 0.1,
-              shouldLoop: false,
-              colors: const [
-                Colors.green,
-                Colors.blue,
-                Colors.pink,
-                Colors.orange,
-                Colors.purple,
-                Colors.red,
-                Colors.yellow,
-              ],
-              createParticlePath: (size) {
-                var path = Path();
-                path.addOval(Rect.fromCircle(
-                  center: Offset.zero,
-                  radius: 4,
-                ));
-                return path;
-              },
-            ),
+      body: Container(
+        // Tüm ekranı kaplayan gradient arka plan
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).colorScheme.primaryContainer,
+              Theme.of(context).colorScheme.secondaryContainer,
+            ],
           ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirection: 0,
-              emissionFrequency: 0.02,
-              numberOfParticles: 10,
-              maxBlastForce: 5,
-              minBlastForce: 2,
-              gravity: 0.1,
-              shouldLoop: false,
-              colors: const [
-                Colors.green,
-                Colors.blue,
-                Colors.pink,
-                Colors.orange,
-                Colors.purple,
-              ],
-            ),
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirection: pi,
-              emissionFrequency: 0.02,
-              numberOfParticles: 10,
-              maxBlastForce: 5,
-              minBlastForce: 2,
-              gravity: 0.1,
-              shouldLoop: false,
-              colors: const [
-                Colors.green,
-                Colors.blue,
-                Colors.pink,
-                Colors.orange,
-                Colors.purple,
-              ],
-            ),
-          ),
-          
-          // Ana içerik
-          SafeArea(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Theme.of(context).colorScheme.primaryContainer,
-                    Theme.of(context).colorScheme.secondaryContainer,
-                  ],
-                ),
-              ),
+        ),
+        child: Stack(
+          children: [
+            // Ana içerik
+            SafeArea(
               child: Column(
                 children: [
                   const SizedBox(height: 32),
@@ -275,8 +205,79 @@ class _GameResultsPageState extends State<GameResultsPage> {
                 ],
               ),
             ),
-          ),
-        ],
+            
+            // Konfeti efektleri en üstte
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirectionality: BlastDirectionality.explosive,
+                particleDrag: 0.05,
+                emissionFrequency: 0.02,
+                numberOfParticles: 20,
+                gravity: 0.1,
+                shouldLoop: false,
+                colors: const [
+                  Colors.green,
+                  Colors.blue,
+                  Colors.pink,
+                  Colors.orange,
+                  Colors.purple,
+                  Colors.red,
+                  Colors.yellow,
+                ],
+                createParticlePath: (size) {
+                  var path = Path();
+                  path.addOval(Rect.fromCircle(
+                    center: Offset.zero,
+                    radius: 4,
+                  ));
+                  return path;
+                },
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirection: 0,
+                emissionFrequency: 0.02,
+                numberOfParticles: 10,
+                maxBlastForce: 5,
+                minBlastForce: 2,
+                gravity: 0.1,
+                shouldLoop: false,
+                colors: const [
+                  Colors.green,
+                  Colors.blue,
+                  Colors.pink,
+                  Colors.orange,
+                  Colors.purple,
+                ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirection: pi,
+                emissionFrequency: 0.02,
+                numberOfParticles: 10,
+                maxBlastForce: 5,
+                minBlastForce: 2,
+                gravity: 0.1,
+                shouldLoop: false,
+                colors: const [
+                  Colors.green,
+                  Colors.blue,
+                  Colors.pink,
+                  Colors.orange,
+                  Colors.purple,
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
