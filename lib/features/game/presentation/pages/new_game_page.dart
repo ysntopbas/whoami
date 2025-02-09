@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:whoami/core/utils/orientation_manager.dart';
 import 'package:whoami/features/category/domain/models/category_model.dart';
 import 'package:whoami/features/category/presentation/providers/category_provider.dart';
 import 'package:whoami/features/game/presentation/pages/game_settings_page.dart';
@@ -19,8 +20,15 @@ class _NewGamePageState extends ConsumerState<NewGamePage> {
   bool _isLoading = true;
 
   @override
+  void initState() {
+    super.initState();
+    OrientationManager.forcePortrait();
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    OrientationManager.forcePortrait();
     _loadAllCategories();
   }
 

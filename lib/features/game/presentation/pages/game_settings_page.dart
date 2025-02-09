@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:whoami/core/utils/orientation_manager.dart';
 import 'package:whoami/features/category/domain/models/category_model.dart';
 import 'package:whoami/features/game/presentation/pages/game_play_page.dart';
 
@@ -53,6 +54,18 @@ class GameSettingsPage extends ConsumerStatefulWidget {
 class _GameSettingsPageState extends ConsumerState<GameSettingsPage> {
   final _playerController = TextEditingController();
   int _timePerPlayer = 60; // Varsayılan süre: 60 saniye
+
+  @override
+  void initState() {
+    super.initState();
+    OrientationManager.forcePortrait();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    OrientationManager.forcePortrait();
+  }
 
   @override
   void dispose() {

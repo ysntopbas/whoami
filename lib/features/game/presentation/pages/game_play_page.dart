@@ -47,8 +47,36 @@ class _GamePlayPageState extends State<GamePlayPage> {
   @override
   void initState() {
     super.initState();
-    // Oyun sayfasında yatay mod
+    _initGame();
+    _forceOrientation();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _forceOrientation();
+  }
+
+  void _forceOrientation() {
+    // Yatay modu zorla ve kısa bir gecikme ile tekrar zorla
     OrientationManager.forceLandscape();
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        OrientationManager.forceLandscape();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _gameTimer?.cancel();
+    _evaluationTimer?.cancel();
+    _accelerometerSubscription?.cancel();
+    OrientationManager.forcePortrait();
+    super.dispose();
+  }
+
+  void _initGame() {
     _remainingWords = List.from(widget.category.items);
     _currentPlayer = widget.players[_currentPlayerIndex];
     _remainingTime = widget.timePerPlayer;
@@ -56,15 +84,6 @@ class _GamePlayPageState extends State<GamePlayPage> {
     _playerScores = widget.players
         .map((name) => PlayerScore(name: name))
         .toList();
-  }
-
-  @override
-  void dispose() {
-    _gameTimer?.cancel();  // Timer'ı temizle
-    _evaluationTimer?.cancel();
-    _accelerometerSubscription?.cancel();
-    OrientationManager.forcePortrait();
-    super.dispose();
   }
 
   void _startCountdown() async {
@@ -239,9 +258,16 @@ class _GamePlayPageState extends State<GamePlayPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Container(
+    // Her build'de yatay modu zorla
+    OrientationManager.forceLandscape();
+    
+    return WillPopScope(
+      onWillPop: () async {
+        OrientationManager.forcePortrait();
+        return true;
+      },
+      child: Scaffold(
+        body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -252,73 +278,114 @@ class _GamePlayPageState extends State<GamePlayPage> {
               ],
             ),
           ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Oyuncu adı ve zamanlayıcı
-                Column(
-                  children: [
-                    if (_isPlaying)
-                      Text(
-                        _remainingTime.toString(),
-                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                          color: _remainingTime <= 10 ? Colors.red : Colors.black,
-                        ),
-                      ),
-                    Text(
-                      _currentPlayer,
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-
-                // Kelime veya hazırlık durumu
-                if (!_isReady)
-                  ElevatedButton(
-                    onPressed: _startCountdown,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 48,
-                        vertical: 16,
-                      ),
-                    ),
-                    child: Text(
-                      'ready'.tr(),
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                  )
-                else if (_isCountingDown)
-                  Text(
-                    _countdown.toString(),
-                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                else
-                  Text(
-                    _currentWord,
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                if (_isPlaying)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: Text(
-                      'tilt_phone_hint'.tr(),
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
-              ],
-            ),
+          child: SafeArea(
+            child: _isReady ? _buildGameContent() : _buildCountdown(),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildGameContent() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Oyuncu adı ve zamanlayıcı
+          Column(
+            children: [
+              if (_isPlaying)
+                Text(
+                  _remainingTime.toString(),
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    color: _remainingTime <= 10 ? Colors.red : Colors.black,
+                  ),
+                ),
+              Text(
+                _currentPlayer,
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+
+          // Kelime veya hazırlık durumu
+          if (!_isReady)
+            ElevatedButton(
+              onPressed: _startCountdown,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 48,
+                  vertical: 16,
+                ),
+              ),
+              child: Text(
+                'ready'.tr(),
+                style: const TextStyle(fontSize: 24),
+              ),
+            )
+          else if (_isCountingDown)
+            Text(
+              _countdown.toString(),
+              style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          else
+            Text(
+              _currentWord,
+              style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+          if (_isPlaying)
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Text(
+                'tilt_phone_hint'.tr(),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCountdown() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Oyuncu adını göster
+          Text(
+            _currentPlayer,
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          const SizedBox(height: 32),
+          // Ready butonu
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _isReady = true;
+                _startCountdown();
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 48,
+                vertical: 16,
+              ),
+            ),
+            child: Text(
+              'ready'.tr(),
+              style: const TextStyle(fontSize: 24),
+            ),
+          ),
+        ],
       ),
     );
   }

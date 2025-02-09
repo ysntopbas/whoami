@@ -4,6 +4,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:whoami/core/utils/orientation_manager.dart';
 import 'package:whoami/features/category/domain/models/category_model.dart';
 import 'package:whoami/features/game/domain/models/player_score_model.dart';
 import 'package:whoami/features/home/presentation/pages/home_page.dart';
@@ -33,32 +34,37 @@ class _GameResultsPageState extends State<GameResultsPage> {
   @override
   void initState() {
     super.initState();
-    // Ekranı dikey moda zorla
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-    
+    // Sonuç sayfası açıldığında kesinlikle dikey mod
+    OrientationManager.forcePortrait();
     _confettiController = ConfettiController(duration: const Duration(seconds: 10));
-    // Konfeti efektini başlat
     _confettiController.play();
   }
 
   @override
   void dispose() {
     _confettiController.dispose();
-    // Tüm yönleri serbest bırak
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
     super.dispose();
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Sayfa her güncellendiğinde dikey modu zorla
+    OrientationManager.forcePortrait();
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    // Hot reload sırasında dikey modu zorla
+    OrientationManager.forcePortrait();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Build sırasında dikey modu zorla
+    OrientationManager.forcePortrait();
+    
     final sortedScores = List<PlayerScore>.from(widget.scores)
       ..sort((a, b) => b.total.compareTo(a.total));
     
@@ -172,6 +178,7 @@ class _GameResultsPageState extends State<GameResultsPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        // Ana menü butonu
                         ElevatedButton.icon(
                           onPressed: () {
                             Navigator.pushAndRemoveUntil(
@@ -183,6 +190,7 @@ class _GameResultsPageState extends State<GameResultsPage> {
                           icon: const Icon(Icons.home),
                           label: Text('main_menu'.tr()),
                         ),
+                        // Tekrar oyna butonu
                         ElevatedButton.icon(
                           onPressed: () {
                             Navigator.pushReplacement(

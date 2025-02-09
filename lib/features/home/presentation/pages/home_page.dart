@@ -1,12 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:whoami/core/utils/orientation_manager.dart';
 import 'package:whoami/features/settings/presentation/pages/settings_page.dart';
 import 'package:whoami/features/category/presentation/pages/categories_page.dart';
 import 'package:whoami/features/game/presentation/pages/new_game_page.dart';
 
-
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    OrientationManager.forcePortrait();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    OrientationManager.forcePortrait();
+  }
 
   @override
   Widget build(BuildContext context) {

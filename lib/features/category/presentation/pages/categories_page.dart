@@ -1,15 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:whoami/core/utils/orientation_manager.dart';
 import 'package:whoami/features/category/domain/models/category_model.dart';
 import '../providers/category_provider.dart';
 import '../widgets/add_category_modal.dart';
 
-class CategoriesPage extends ConsumerWidget {
+class CategoriesPage extends ConsumerStatefulWidget {
   const CategoriesPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CategoriesPage> createState() => _CategoriesPageState();
+}
+
+class _CategoriesPageState extends ConsumerState<CategoriesPage> {
+  @override
+  void initState() {
+    super.initState();
+    OrientationManager.forcePortrait();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    OrientationManager.forcePortrait();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // initState benzeri bir etki için
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(categoryProvider.notifier).loadCategories(context.locale.languageCode);
