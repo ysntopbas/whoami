@@ -8,6 +8,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:whoami/features/category/domain/models/category_model.dart';
 import 'package:whoami/features/game/domain/models/player_score_model.dart';
 import 'package:whoami/features/game/presentation/pages/game_results_page.dart';
+import 'package:whoami/core/utils/orientation_manager.dart';
 
 class GamePlayPage extends StatefulWidget {
   final CategoryModel category;
@@ -45,13 +46,11 @@ class _GamePlayPageState extends State<GamePlayPage> {
   @override
   void initState() {
     super.initState();
+    // Oyun sayfasında yatay mod
+    OrientationManager.forceLandscape();
     _remainingWords = List.from(widget.category.items);
     _currentPlayer = widget.players[_currentPlayerIndex];
     _remainingTime = widget.timePerPlayer;
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
     // Oyuncu skorlarını başlat
     _playerScores = widget.players
         .map((name) => PlayerScore(name: name))
@@ -60,14 +59,10 @@ class _GamePlayPageState extends State<GamePlayPage> {
 
   @override
   void dispose() {
+    // Oyun sayfasından çıkınca dikey mod
+    OrientationManager.forcePortrait();
     _evaluationTimer?.cancel();
     _accelerometerSubscription?.cancel();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
     super.dispose();
   }
 

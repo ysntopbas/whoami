@@ -3,11 +3,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'features/home/presentation/pages/home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'core/utils/orientation_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
+  
+  // Uygulama başlangıcında dikey mod zorla
+  OrientationManager.forcePortrait();
   
   runApp(
     ProviderScope(
