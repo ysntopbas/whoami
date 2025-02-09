@@ -24,6 +24,9 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     OrientationManager.forcePortrait();
+    
+    // Dil değiştiğinde kategorileri yeniden yükle
+    ref.read(categoryProvider.notifier).loadCategories(context.locale.languageCode);
   }
 
   @override

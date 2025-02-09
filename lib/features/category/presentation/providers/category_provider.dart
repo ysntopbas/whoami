@@ -5,6 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/models/category_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 final categoryProvider =
     StateNotifierProvider<CategoryNotifier, List<CategoryModel>>((ref) {
@@ -23,12 +26,13 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
 
   Future<void> _initPrefs() async {
     _prefs = await SharedPreferences.getInstance();
+    // Varsayılan olarak 'tr' diliyle başla
     loadCategories('tr');
   }
 
   Future<void> loadCategories(String language) async {
     try {
-      // Firebase'den tüm kategorileri yükle (varsayılan ve paylaşılan)
+      // Firebase'den dile göre kategorileri yükle
       final snapshot = await _firestore
           .collection('categories')
           .where('language', isEqualTo: language)
@@ -38,17 +42,17 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
           .map((doc) => CategoryModel.fromJson(doc.data()))
           .toList();
 
-      // Yerel kayıtlı özel kategorileri yükle
+      // Yerel kayıtlı özel kategorileri yükle (sadece mevcut dildeki kategorileri)
       final customCategories = await _loadCustomCategories(language);
       
-      // İndirilmiş kategorileri filtrele
+      // İndirilmiş kategorileri filtrele (sadece mevcut dildeki kategorileri)
       final downloadedCategories = firebaseCategories
-          .where((cat) => cat.isCustom && cat.isDownloaded)
+          .where((cat) => cat.isCustom && cat.isDownloaded && cat.language == language)
           .toList();
 
-      // Varsayılan kategorileri filtrele
+      // Varsayılan kategorileri filtrele (sadece mevcut dildeki kategorileri)
       final defaultCategories = firebaseCategories
-          .where((cat) => !cat.isCustom)
+          .where((cat) => !cat.isCustom && cat.language == language)
           .toList();
 
       state = [...defaultCategories, ...customCategories, ...downloadedCategories];
@@ -66,7 +70,7 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
         final List<dynamic> customList = json.decode(customCategoriesJson);
         return customList
             .map((json) => CategoryModel.fromJson(json))
-            .where((category) => category.isCustom)
+            .where((category) => category.isCustom && category.language == language)
             .toList();
       }
     } catch (e) {
@@ -170,7 +174,7 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
     return state.where((cat) => cat.isDownloaded).toList();
   }
 
-  // İndirilebilir kategorileri getir (henüz indirilmemiş paylaşılan kategoriler)
+  // İndirilebilir kategorileri getir (sadece mevcut dildeki kategorileri)
   Future<List<CategoryModel>> getDownloadableCategories(String language) async {
     try {
       final snapshot = await _firestore
@@ -182,10 +186,9 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
       final downloadableCategories = snapshot.docs
           .map((doc) => CategoryModel.fromJson(doc.data()))
           .where((category) => 
-            // Henüz indirilmemiş kategorileri filtrele
             !state.any((stateCategory) => 
               stateCategory.id == category.id && stateCategory.isDownloaded
-            )
+            ) && category.language == language
           )
           .toList();
 
