@@ -120,8 +120,9 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
           color: isDownloadable ? Colors.grey[50] : Colors.white,
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
+            Flexible(
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
@@ -222,48 +223,43 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
                       },
                     )
                   else if (category.isDownloaded)
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          iconSize: 20,
-                          constraints: const BoxConstraints(),
-                          padding: const EdgeInsets.all(8),
-                          icon: const Icon(Icons.delete_outline),
-                          color: Theme.of(context).colorScheme.error,
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text('remove_category'.tr()),
-                                content: Text('remove_category_confirm'.tr()),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text('cancel'.tr()),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      ref.read(categoryProvider.notifier)
-                                          .removeDownloadedCategory(category.id);
-                                      Navigator.pop(context);
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('category_removed'.tr())),
-                                      );
-                                    },
-                                    child: Text(
-                                      'remove'.tr(),
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.error,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                    IconButton(
+                      iconSize: 20,
+                      constraints: const BoxConstraints(),
+                      padding: const EdgeInsets.all(8),
+                      icon: const Icon(Icons.delete_outline),
+                      color: Theme.of(context).colorScheme.error,
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text('remove_category'.tr()),
+                            content: Text('remove_category_confirm'.tr()),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text('cancel'.tr()),
                               ),
-                            );
-                          },
-                        ),
-                      ],
+                              TextButton(
+                                onPressed: () {
+                                  ref.read(categoryProvider.notifier)
+                                      .removeDownloadedCategory(category.id);
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('category_removed'.tr())),
+                                  );
+                                },
+                                child: Text(
+                                  'remove'.tr(),
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                 ],
               ),
@@ -300,7 +296,19 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
       ),
       itemCount: categories.length,
       itemBuilder: (context, index) {
-        final category = categories[index];
+        return _buildCategoryCard(categories[index]);
+      },
+    );
+  }
+
+  Widget _buildCustomCategoryList(List<CategoryModel> categories) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(16),
+      itemCount: categories.length,
+      itemBuilder: (context, index) {
+        final customCategory = categories[index];
         return Card(
           elevation: 2,
           child: Container(
@@ -309,81 +317,34 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
               color: Colors.white,
             ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      // Ana içerik
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              category.icon,
-                              style: const TextStyle(fontSize: 32),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              category.name,
-                              style: Theme.of(context).textTheme.titleMedium,
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              '${category.items.length} ${"word".tr()}',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          customCategory.icon,
+                          style: const TextStyle(fontSize: 32),
                         ),
-                      ),
-                      // Silme butonu (eğer indirilmiş kategoriyse)
-                      if (isDownloaded)
-                        Positioned(
-                          top: 8,
-                          right: 8,
-                          child: IconButton(
-                            icon: const Icon(Icons.delete_outline),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: Text('remove_category'.tr()),
-                                  content: Text('remove_category_confirm'.tr()),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text('cancel'.tr()),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        ref.read(categoryProvider.notifier)
-                                            .removeDownloadedCategory(category.id);
-                                        Navigator.pop(context);
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text('category_removed'.tr()),
-                                          ),
-                                        );
-                                      },
-                                      child: Text(
-                                        'remove'.tr(),
-                                        style: TextStyle(
-                                          color: Theme.of(context).colorScheme.error,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+                        const SizedBox(height: 8),
+                        Text(
+                          customCategory.name,
+                          style: Theme.of(context).textTheme.titleMedium,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                    ],
+                        Text(
+                          '${customCategory.items.length} ${"word".tr()}',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                // Like/Dislike bölümü
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                   decoration: BoxDecoration(
@@ -397,49 +358,52 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      // Like butonu ve sayısı
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            iconSize: 20,
-                            constraints: const BoxConstraints(),
-                            padding: const EdgeInsets.all(8),
-                            icon: Icon(
-                              category.isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
-                              color: category.isLiked ? Colors.blue : Colors.grey,
-                            ),
-                            onPressed: () {
-                              ref.read(categoryProvider.notifier).toggleLike(category.id);
-                            },
-                          ),
-                          Text(
-                            category.likes.toString(),
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
+                      // Paylaş butonu
+                      IconButton(
+                        iconSize: 20,
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(8),
+                        icon: const Icon(Icons.publish),
+                        color: Theme.of(context).colorScheme.primary,
+                        onPressed: () => _showPublishDialog(context, ref, customCategory),
                       ),
-                      // Dislike butonu ve sayısı
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            iconSize: 20,
-                            constraints: const BoxConstraints(),
-                            padding: const EdgeInsets.all(8),
-                            icon: Icon(
-                              category.isDisliked ? Icons.thumb_down : Icons.thumb_down_outlined,
-                              color: category.isDisliked ? Colors.red : Colors.grey,
+                      // Silme butonu
+                      IconButton(
+                        iconSize: 20,
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(8),
+                        icon: const Icon(Icons.delete_outline),
+                        color: Theme.of(context).colorScheme.error,
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text('remove_category'.tr()),
+                              content: Text('remove_category_confirm'.tr()),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text('cancel'.tr()),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    ref.read(categoryProvider.notifier).deleteCategory(customCategory.id);
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('category_removed'.tr())),
+                                    );
+                                  },
+                                  child: Text(
+                                    'remove'.tr(),
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.error,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            onPressed: () {
-                              ref.read(categoryProvider.notifier).toggleDislike(category.id);
-                            },
-                          ),
-                          Text(
-                            category.dislikes.toString(),
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -448,19 +412,6 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
             ),
           ),
         );
-      },
-    );
-  }
-
-  Widget _buildCustomCategoryList(List<CategoryModel> categories) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
-      itemCount: categories.length,
-      itemBuilder: (context, index) {
-        final customCategory = categories[index];
-        return _buildCategoryCard(customCategory);
       },
     );
   }
