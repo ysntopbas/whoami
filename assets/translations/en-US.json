@@ -63,5 +63,11 @@
   "game_over": "Game Over!",
   "time_up": "Time's Up!",
   "current_player": "Current Player",
-  "tilt_phone_hint": "Tilt up for correct, down for wrong"
+  "tilt_phone_hint": "Tilt up for correct, down for wrong",
+  "correct": "Correct",
+  "wrong": "Wrong",
+  "total": "Total: {}",
+  "main_menu": "Main Menu",
+  "play_again": "Play Again",
+  "winner": "Winner"
 } 

@@ -63,5 +63,11 @@
   "game_over": "Oyun Bitti!",
   "time_up": "Süre Doldu!",
   "current_player": "Sıradaki Oyuncu",
-  "tilt_phone_hint": "Doğru için yukarı, yanlış için aşağı eğin"
+  "tilt_phone_hint": "Doğru için yukarı, yanlış için aşağı eğin",
+  "correct": "Doğru",
+  "wrong": "Yanlış",
+  "total": "Toplam: {}",
+  "main_menu": "Ana Menü",
+  "play_again": "Tekrar Oyna",
+  "winner": "Kazanan"
 } 

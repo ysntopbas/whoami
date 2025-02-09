@@ -6,6 +6,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'dart:math';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:whoami/features/category/domain/models/category_model.dart';
+import 'package:whoami/features/game/domain/models/player_score_model.dart';
+import 'package:whoami/features/game/presentation/pages/game_results_page.dart';
 
 class GamePlayPage extends StatefulWidget {
   final CategoryModel category;
@@ -37,7 +39,8 @@ class _GamePlayPageState extends State<GamePlayPage> {
   bool _canEvaluate = true;
   bool _waitingForReset = false;
   Timer? _evaluationTimer;
-  double _lastZValue = 0;
+  double _lastZValue = 0; //This value is used to check if the phone is in the correct position.Don't delete this.
+  late List<PlayerScore> _playerScores;
 
   @override
   void initState() {
@@ -49,6 +52,10 @@ class _GamePlayPageState extends State<GamePlayPage> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+    // Oyuncu skorlarını başlat
+    _playerScores = widget.players
+        .map((name) => PlayerScore(name: name))
+        .toList();
   }
 
   @override
@@ -163,21 +170,29 @@ class _GamePlayPageState extends State<GamePlayPage> {
   }
 
   void _handleCorrect() async {
-    await SystemSound.play(SystemSoundType.alert); // Doğru için uyarı sesi
-    await HapticFeedback.lightImpact(); // Hafif titreşim
-    setState(() => _currentWord = _getRandomWord());
+    await SystemSound.play(SystemSoundType.alert);
+    await HapticFeedback.lightImpact();
+    setState(() {
+      _playerScores[_currentPlayerIndex].correct++;
+      _currentWord = _getRandomWord();
+    });
   }
 
   void _handleWrong() async {
-    await SystemSound.play(SystemSoundType.click); // Yanlış için tık sesi
-    await HapticFeedback.mediumImpact(); // Orta şiddette titreşim
-    setState(() => _currentWord = _getRandomWord());
+    await SystemSound.play(SystemSoundType.click);
+    await HapticFeedback.mediumImpact();
+    setState(() {
+      _playerScores[_currentPlayerIndex].wrong++;
+      _currentWord = _getRandomWord();
+    });
   }
 
   String _getRandomWord() {
     if (_remainingWords.isEmpty) {
-      _isPlaying = false;
-      return 'game_over'.tr();
+      // Kelimeler bittiyse sonraki oyuncuya geç
+      _nextPlayer();
+      // Kelime listesini yeniden doldur
+      _remainingWords = List.from(widget.category.items);
     }
     
     final random = Random();
@@ -190,13 +205,32 @@ class _GamePlayPageState extends State<GamePlayPage> {
   void _nextPlayer() {
     _accelerometerSubscription?.cancel();
     setState(() {
-      _currentPlayerIndex = (_currentPlayerIndex + 1) % widget.players.length;
-      _currentPlayer = widget.players[_currentPlayerIndex];
-      _isReady = false;
-      _isPlaying = false;
-      _countdown = 3;
-      _remainingTime = widget.timePerPlayer;
+      if (_currentPlayerIndex == widget.players.length - 1) {
+        // Tüm oyuncular bitti, sonuç ekranını göster
+        _showGameResults();
+      } else {
+        _currentPlayerIndex = (_currentPlayerIndex + 1);
+        _currentPlayer = widget.players[_currentPlayerIndex];
+        _isReady = false;
+        _isPlaying = false;
+        _countdown = 3;
+        _remainingTime = widget.timePerPlayer;
+      }
     });
+  }
+
+  void _showGameResults() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GameResultsPage(
+          scores: _playerScores,
+          category: widget.category,
+          timePerPlayer: widget.timePerPlayer,
+          players: widget.players,
+        ),
+      ),
+    );
   }
 
   @override
