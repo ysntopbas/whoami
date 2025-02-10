@@ -7,9 +7,7 @@ class CategoryModel {
   final bool isDownloaded;
   final String language;
   final int likes;
-  final int dislikes;
   final bool isLiked;
-  final bool isDisliked;
 
   CategoryModel({
     required this.id,
@@ -20,9 +18,7 @@ class CategoryModel {
     this.isCustom = false,
     this.isDownloaded = false,
     this.likes = 0,
-    this.dislikes = 0,
     this.isLiked = false,
-    this.isDisliked = false,
   });
 
   CategoryModel copyWith({
@@ -33,9 +29,7 @@ class CategoryModel {
     bool? isDownloaded,
     String? language,
     int? likes,
-    int? dislikes,
     bool? isLiked,
-    bool? isDisliked,
   }) {
     return CategoryModel(
       id: id,
@@ -46,9 +40,7 @@ class CategoryModel {
       isDownloaded: isDownloaded ?? this.isDownloaded,
       language: language ?? this.language,
       likes: likes ?? this.likes,
-      dislikes: dislikes ?? this.dislikes,
       isLiked: isLiked ?? this.isLiked,
-      isDisliked: isDisliked ?? this.isDisliked,
     );
   }
 
@@ -62,9 +54,7 @@ class CategoryModel {
       isCustom: json['isCustom'] as bool? ?? false,
       isDownloaded: json['isDownloaded'] as bool? ?? false,
       likes: json['likes'] as int? ?? 0,
-      dislikes: json['dislikes'] as int? ?? 0,
       isLiked: json['isLiked'] as bool? ?? false,
-      isDisliked: json['isDisliked'] as bool? ?? false,
     );
   }
 
@@ -78,9 +68,7 @@ class CategoryModel {
       'isCustom': isCustom,
       'isDownloaded': isDownloaded,
       'likes': likes,
-      'dislikes': dislikes,
       'isLiked': isLiked,
-      'isDisliked': isDisliked,
     };
   }
 

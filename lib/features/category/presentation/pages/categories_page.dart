@@ -186,28 +186,6 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> {
                       ),
                     ],
                   ),
-                  // Dislike butonu ve sayısı
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        iconSize: 20,
-                        constraints: const BoxConstraints(),
-                        padding: const EdgeInsets.all(8),
-                        icon: Icon(
-                          category.isDisliked ? Icons.thumb_down : Icons.thumb_down_outlined,
-                          color: category.isDisliked ? Colors.red : Colors.grey,
-                        ),
-                        onPressed: () {
-                          ref.read(categoryProvider.notifier).toggleDislike(category.id);
-                        },
-                      ),
-                      Text(
-                        category.dislikes.toString(),
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ],
-                  ),
                   // İndirme/Silme butonu
                   if (isDownloadable)
                     IconButton(

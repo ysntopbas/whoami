@@ -19,6 +19,7 @@ const String _customCategoriesKey = 'custom_categories';
 class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
   late SharedPreferences _prefs;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static const String _likedCategoriesKey = 'liked_categories';
   
   CategoryNotifier() : super([]) {
     _initPrefs();
@@ -30,8 +31,21 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
     loadCategories('tr');
   }
 
+  // Beğenilen kategorileri kaydet
+  Future<void> _saveLikedCategories(Set<String> likedIds) async {
+    await _prefs.setStringList(_likedCategoriesKey, likedIds.toList());
+  }
+
+  // Beğenilen kategorileri yükle
+  Set<String> _loadLikedCategories() {
+    return Set<String>.from(_prefs.getStringList(_likedCategoriesKey) ?? []);
+  }
+
   Future<void> loadCategories(String language) async {
     try {
+      // Beğenilen kategori ID'lerini yükle
+      final likedIds = _loadLikedCategories();
+
       // Firebase'den dile göre kategorileri yükle
       final snapshot = await _firestore
           .collection('categories')
@@ -39,18 +53,25 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
           .get();
 
       final firebaseCategories = snapshot.docs
-          .map((doc) => CategoryModel.fromJson(doc.data()))
+          .map((doc) {
+            final data = doc.data();
+            // Kategori modelini oluştururken beğeni durumunu kontrol et
+            return CategoryModel.fromJson({
+              ...data,
+              'isLiked': likedIds.contains(data['id']),
+            });
+          })
           .toList();
 
-      // Yerel kayıtlı özel kategorileri yükle (sadece mevcut dildeki kategorileri)
+      // Yerel kayıtlı özel kategorileri yükle
       final customCategories = await _loadCustomCategories(language);
       
-      // İndirilmiş kategorileri filtrele (sadece mevcut dildeki kategorileri)
+      // İndirilmiş kategorileri filtrele
       final downloadedCategories = firebaseCategories
           .where((cat) => cat.isCustom && cat.isDownloaded && cat.language == language)
           .toList();
 
-      // Varsayılan kategorileri filtrele (sadece mevcut dildeki kategorileri)
+      // Varsayılan kategorileri filtrele
       final defaultCategories = firebaseCategories
           .where((cat) => !cat.isCustom && cat.language == language)
           .toList();
@@ -210,86 +231,56 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
   Future<void> toggleLike(String categoryId) async {
     try {
       final categoryRef = _firestore.collection('categories').doc(categoryId);
-      final category = state.firstWhere((cat) => cat.id == categoryId);
-
-      if (category.isDisliked) {
-        // Önce dislike'ı kaldır
-        await categoryRef.update({
-          'dislikes': FieldValue.increment(-1),
-        });
+      final doc = await categoryRef.get();
+      
+      if (!doc.exists) {
+        print('toggle_like_error'.tr() + ': Document does not exist');
+        return;
       }
 
-      if (category.isLiked) {
-        // Like'ı kaldır
-        await categoryRef.update({
-          'likes': FieldValue.increment(-1),
-        });
-        state = state.map((cat) => cat.id == categoryId
-            ? cat.copyWith(
-                isLiked: false,
-                likes: cat.likes - 1,
-                isDisliked: false,
-              )
-            : cat).toList();
+      // Beğenilen kategorileri yükle
+      Set<String> likedIds = _loadLikedCategories();
+      final isLiked = likedIds.contains(categoryId);
+
+      if (isLiked) {
+        // Unlike işlemi
+        final currentLikes = doc.data()?['likes'] ?? 0;
+        
+        // Eğer likes 0'dan büyükse azalt
+        if (currentLikes > 0) {
+          await categoryRef.update({
+            'likes': FieldValue.increment(-1),
+          });
+          
+          // Yerel durumu güncelle
+          likedIds.remove(categoryId);
+          state = state.map((cat) => cat.id == categoryId
+              ? cat.copyWith(
+                  isLiked: false,
+                  likes: cat.likes > 0 ? cat.likes - 1 : 0,
+                )
+              : cat).toList();
+        }
       } else {
         // Like ekle
         await categoryRef.update({
           'likes': FieldValue.increment(1),
         });
+        
+        // Yerel durumu güncelle
+        likedIds.add(categoryId);
         state = state.map((cat) => cat.id == categoryId
             ? cat.copyWith(
                 isLiked: true,
                 likes: cat.likes + 1,
-                isDisliked: false,
               )
             : cat).toList();
       }
-      await _saveCustomCategories(state);
+      
+      // Beğenilen kategorileri kaydet
+      await _saveLikedCategories(likedIds);
     } catch (e) {
       print('toggle_like_error'.tr() + ' $e');
-    }
-  }
-
-  Future<void> toggleDislike(String categoryId) async {
-    try {
-      final categoryRef = _firestore.collection('categories').doc(categoryId);
-      final category = state.firstWhere((cat) => cat.id == categoryId);
-
-      if (category.isLiked) {
-        // Önce like'ı kaldır
-        await categoryRef.update({
-          'likes': FieldValue.increment(-1),
-        });
-      }
-
-      if (category.isDisliked) {
-        // Dislike'ı kaldır
-        await categoryRef.update({
-          'dislikes': FieldValue.increment(-1),
-        });
-        state = state.map((cat) => cat.id == categoryId
-            ? cat.copyWith(
-                isDisliked: false,
-                dislikes: cat.dislikes - 1,
-                isLiked: false,
-              )
-            : cat).toList();
-      } else {
-        // Dislike ekle
-        await categoryRef.update({
-          'dislikes': FieldValue.increment(1),
-        });
-        state = state.map((cat) => cat.id == categoryId
-            ? cat.copyWith(
-                isDisliked: true,
-                dislikes: cat.dislikes + 1,
-                isLiked: false,
-              )
-            : cat).toList();
-      }
-      await _saveCustomCategories(state);
-    } catch (e) {
-      print('toggle_dislike_error'.tr() + ' $e');
     }
   }
 } 
