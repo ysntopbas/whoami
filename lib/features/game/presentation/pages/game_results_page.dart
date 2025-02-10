@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:whoami/core/utils/orientation_manager.dart';
 import 'package:whoami/features/category/domain/models/category_model.dart';
